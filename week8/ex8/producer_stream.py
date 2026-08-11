@@ -13,10 +13,13 @@ TOPIC = "events"                      # you may rename this
 
 # ----- EDIT: your events (each is a fact that already happened) -------------
 EVENTS = [
-    {"type": "OrderPlaced",    "order_id": 1, "amount": 19.99},
-    {"type": "OrderPlaced",    "order_id": 2, "amount": 5.00},
-    {"type": "OrderCancelled", "order_id": 1},
-    {"type": "OrderPlaced",    "order_id": 3, "amount": 42.00},
+    {"type": "TicketOpened", "ticket_id": 101, "customer_id": "alice", "category": "billing", "priority": "high", "subject": "Duplicate charge"},
+    {"type": "TicketAssigned", "ticket_id": 101, "agent_id": "sam"},
+    {"type": "CommentAdded", "ticket_id": 101, "comment_id": 1, "author_id": "sam", "body": "Looking into this now.", "is_internal": False},
+    {"type": "TicketOpened", "ticket_id": 102, "customer_id": "bob", "category": "access", "priority": "low", "subject": "Password reset"},
+    {"type": "TicketResolved", "ticket_id": 102, "resolution_code": "self_service", "resolved_by": "system"},
+    {"type": "TicketResolved", "ticket_id": 101, "resolution_code": "refund_issued", "resolved_by": "sam"},
+    {"type": "SendReceipt", "ticket_id": 101, "customer_id": "alice", "amount": 42.50},
 ]
 # ----------------------------------------------------------------------------
 

@@ -18,9 +18,9 @@ producer = KafkaProducer(
 )
 event = {
     "event": "ImagePushed",
-    "image": "calculator",
-    "registry": "localhost:5001",
-    # TODO: add the version, for example  "version": os.environ["VERSION"]
+    "image": os.environ.get("IMAGE", "calculator"),
+    "registry": os.environ.get("REGISTRY", "localhost:5001"),
+    "version": os.environ["VERSION"],
 }
 producer.send(os.environ.get("TOPIC", "ci.images"), event).get(timeout=10)
 producer.flush()

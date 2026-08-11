@@ -39,7 +39,10 @@ pipeline {
                 }
             }
             steps {
-                sh 'python week10/calculator/publish_event.py'
+                sh '''
+                    echo "announcing ${IMAGE}:${VERSION} to ${TOPIC} on ${BROKER}"
+                    python week10/calculator/publish_event.py
+                '''
             }
         }
     }

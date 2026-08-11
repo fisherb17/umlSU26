@@ -1,31 +1,31 @@
 """Exercise 8 starter — the REACTOR consumer.
-
 This one reacts DIFFERENTLY depending on the event type. You only edit the
 handle() function: add one branch per event type you care about (Part 1).
 Everything else can stay as-is.
 """
 import json
 from kafka import KafkaConsumer
-
 BROKER = "localhost:9092"
 TOPIC = "events"
-
-running_total = 0.0
-
-
+open_count = 0
+resolved_count = 0
 def handle(event):
-    global running_total
+    global open_count, resolved_count
     # ----- EDIT: one branch per event type you want to react to -------------
-    if event.get("type") == "OrderPlaced":
-        running_total += event.get("amount", 0)
-        print(f"reactor: order placed, running total = {running_total:.2f}")
-    elif event.get("type") == "OrderCancelled":
-        print(f"reactor: order {event.get('order_id')} cancelled (total unchanged)")
+    if event["type"] == "TicketOpened":
+        open_count += 1
+        print(f"[reactor] Ticket {event['ticket_id']} opened by {event['customer_id']} "
+              f"(priority: {event['priority']}). Open tickets so far: {open_count}")
+    elif event["type"] == "TicketResolved":
+        resolved_count += 1
+        backlog = open_count - resolved_count
+        print(f"[reactor] Ticket {event['ticket_id']} resolved via {event['resolution_code']}. "
+              f"Backlog: {backlog}")
+    elif event["type"] == "SendReceipt":
+        print(f"[reactor] Sending receipt to {event['customer_id']} for ${event['amount']}")
     else:
         print(f"reactor: ignoring {event.get('type')}")
     # ------------------------------------------------------------------------
-
-
 consumer = KafkaConsumer(
     TOPIC,
     bootstrap_servers=BROKER,

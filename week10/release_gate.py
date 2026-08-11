@@ -84,11 +84,30 @@ consumer = KafkaConsumer(
 )
 
 print("release gate up — waiting for ImagePushed events. Ctrl-C to stop.")
-for msg in consumer:
-    event = msg.value
-    print(f"[event] {event}")
 
-    # TODO: read the version from the event.
-    # TODO: deploy(version), then run_tests(). If it passes, promote(version).
-    #       If it fails, do nothing.
-    # TODO: teardown(version) when you are done with the candidate container.
+try:
+    for msg in consumer:
+        event = msg.value
+        print(f"[event] {event}")
+        version = event.get("version")
+        if not version:
+            print("    no version in event, ignoring")
+            continue
+        try:
+            print(f"    deploying calculator:{version} on port {HOST_PORT}")
+            deploy(version)
+
+            if run_tests():
+                print(f"    acceptance test PASSED for version {version}")
+                promote(version)
+            else:
+                print(f"    acceptance test FAILED for version {version}; "
+                      f"calculator:latest left unchanged")
+        except subprocess.CalledProcessError as err:
+            stderr = (err.stderr or b"").decode().strip()
+            print(f"    docker step failed for version {version}: {stderr}")
+        finally:
+            teardown(version)
+            print(f"    torn down candidate-{version}")
+except KeyboardInterrupt:
+    print("\nrelease gate stopped")
